@@ -167,7 +167,8 @@ localizaciones_cercanas = encontrar_localizaciones_cercanas(latitud_ref, longitu
 
 # Mostrar las localizaciones cercanas, si existen
 try:
-    if not localizaciones_cercanas.empty:
+    if localizaciones_cercanas is not None and not localizaciones_cercanas.empty:
+    #if not localizaciones_cercanas.empty:
         #st.write(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']])
         # Renombrar columnas
         localizaciones_cercanas.rename(columns={
@@ -183,7 +184,7 @@ try:
     else:
         st.warning("No hay localizaciones dentro del rango especificado.")
         #st.write("No hay localizaciones dentro del rango especificado.")
-except Excepcion as e:
+except TypeError as e:
     #st.error(f"Ocurrió un error: {e}")
     st.warning("No hay localizaciones dentro del rango especificado.")
     st.stop()
