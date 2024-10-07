@@ -166,22 +166,27 @@ else:
 localizaciones_cercanas = encontrar_localizaciones_cercanas(latitud_ref, longitud_ref, df_filtrado_global, dist_maxima)
 
 # Mostrar las localizaciones cercanas, si existen
-if not localizaciones_cercanas.empty:
-    #st.write(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']])
-    # Renombrar columnas
-    localizaciones_cercanas.rename(columns={
-    'nombre': 'Nombre del Establecimiento',
-    'distancia': 'Distancia (km)',
-    'domicilio': 'Dirección',
-    'servicio': 'Tipo de Servicio'
-    }, inplace=True)
-    #st.dataframe(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']], hide_index=True)
+try:
+    if not localizaciones_cercanas.empty:
+        #st.write(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']])
+        # Renombrar columnas
+        localizaciones_cercanas.rename(columns={
+        'nombre': 'Nombre del Establecimiento',
+        'distancia': 'Distancia (km)',
+        'domicilio': 'Dirección',
+        'servicio': 'Tipo de Servicio'
+        }, inplace=True)
+        #st.dataframe(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']], hide_index=True)
 
-    # Mostrar el DataFrame sin el índice y con los nuevos nombres de columnas
-    st.dataframe(localizaciones_cercanas[['Nombre del Establecimiento', 'Distancia (km)', 'Dirección', 'Tipo de Servicio']], hide_index=True)
-else:
+        # Mostrar el DataFrame sin el índice y con los nuevos nombres de columnas
+        st.dataframe(localizaciones_cercanas[['Nombre del Establecimiento', 'Distancia (km)', 'Dirección', 'Tipo de Servicio']], hide_index=True)
+    else:
+        st.warning("No hay localizaciones dentro del rango especificado.")
+        #st.write("No hay localizaciones dentro del rango especificado.")
+except TypeError as e:
+    #st.error(f"Ocurrió un error: {e}")
     st.warning("No hay localizaciones dentro del rango especificado.")
-    #st.write("No hay localizaciones dentro del rango especificado.")
+    st.stop()
 
 
 
