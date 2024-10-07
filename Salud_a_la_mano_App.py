@@ -140,7 +140,7 @@ except TypeError as e:
 # ---------------- DUDA ----------------
 # Acá intento adaptar la selección de tipos de estableciemietos al tipo de widget de streamlit
 
-tipo_elegido = st.multiselect('Elige el tipo de establecimiento que necesitas', opciones)
+tipo_elegido = st.multiselect('Elige el tipo de servicio/establecimiento que necesitas', opciones)
 
 # Lógica para restringir la selección
 #if 'Todos' in tipo_elegido:
