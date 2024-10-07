@@ -184,7 +184,7 @@ try:
     else:
         st.warning("No hay localizaciones dentro del rango especificado.")
         #st.write("No hay localizaciones dentro del rango especificado.")
-except TypeError as e:
+except Exception as e:
     #st.error(f"Ocurrió un error: {e}")
     st.warning("No hay localizaciones dentro del rango especificado.")
     st.stop()
