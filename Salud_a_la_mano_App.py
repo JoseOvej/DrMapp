@@ -112,7 +112,7 @@ if not direccion:
 ##cantidad = int(input("Ingrese la cantidad de establecimientos a mostrar: "))
 
 # El usuario tiene que definir una distancia máxima para filtrar los establecimientos
-dist_maxima = st.slider('Seleccionar distancia máxima', min_value=0, max_value=100)
+dist_maxima = st.slider('Seleccionar distancia máxima (en KM)', min_value=0, max_value=100)
 
 if not dist_maxima or dist_maxima == 0:
     st.stop()  # Detener la ejecución aquí
@@ -180,7 +180,8 @@ if not localizaciones_cercanas.empty:
     # Mostrar el DataFrame sin el índice y con los nuevos nombres de columnas
     st.dataframe(localizaciones_cercanas[['Nombre del Establecimiento', 'Distancia (km)', 'Dirección', 'Tipo de Servicio']], hide_index=True)
 else:
-    st.write("No hay localizaciones dentro del rango especificado.")
+    st.warning("No hay localizaciones dentro del rango especificado.")
+    #st.write("No hay localizaciones dentro del rango especificado.")
 
 
 
