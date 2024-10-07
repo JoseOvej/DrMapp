@@ -167,7 +167,6 @@ localizaciones_cercanas = encontrar_localizaciones_cercanas(latitud_ref, longitu
 
 # Mostrar las localizaciones cercanas, si existen
 try:
-    st.write(localizaciones_cercanas)  # Verifica qué contiene
     if localizaciones_cercanas is not None and not localizaciones_cercanas.empty:
     #if not localizaciones_cercanas.empty:
         #st.write(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']])
