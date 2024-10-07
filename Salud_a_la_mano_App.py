@@ -104,7 +104,7 @@ def encontrar_localizaciones_cercanas(latitud_referencia, longitud_referencia, d
 
 # EJECUCIÓN
 # Solicitar la dirección al usuario
-direccion = st.text_input('Ingrese la dirección (sin acentos, el formato es: dirección, ciudad, país): ')
+direccion = st.text_input('Ingresar la dirección (sin acentos, el formato es: dirección, ciudad, país): ')
 
 if not direccion:
     st.stop()  # Detener la ejecución aquí
@@ -113,7 +113,7 @@ if not direccion:
 ##cantidad = int(input("Ingrese la cantidad de establecimientos a mostrar: "))
 
 # El usuario tiene que definir una distancia máxima para filtrar los establecimientos
-dist_maxima = st.slider('Seleccionar distancia máxima (en KM)', min_value=0, max_value=100)
+dist_maxima = st.slider('Seleccionar distancia máxima (en KM): ', min_value=0, max_value=100)
 
 if not dist_maxima or dist_maxima == 0:
     st.stop()  # Detener la ejecución aquí
@@ -140,7 +140,7 @@ except TypeError as e:
 # ---------------- DUDA ----------------
 # Acá intento adaptar la selección de tipos de estableciemietos al tipo de widget de streamlit
 
-tipo_elegido = st.multiselect('Elige el tipo de servicio/establecimiento que necesitas', opciones)
+tipo_elegido = st.multiselect('Elegir el tipo de servicio/establecimiento: ', opciones)
 
 # Lógica para restringir la selección
 #if 'Todos' in tipo_elegido:
