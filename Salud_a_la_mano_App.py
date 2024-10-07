@@ -92,7 +92,7 @@ def encontrar_localizaciones_cercanas(latitud_referencia, longitud_referencia, d
     distancias_df = pd.DataFrame(distancias)
 
     if distancias_df.empty:
-        st.warning("No hay localizaciones dentro del rango especificado.")
+        st.warning("No hay localizaciones dentro del rango especificado. Seleccione otro servicio, o reinicie la búsqueda.")
         st.stop()
 
     # Ordenar el DataFrame por la distancia en orden ascendente
