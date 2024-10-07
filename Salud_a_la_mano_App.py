@@ -7,14 +7,13 @@ import folium
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 
-# Igresamos valores iniciales por defecto para que la página no de error
-coordenadas = [-27.77392042365015, -64.31305325737927]
+global df_filtrado_global
 
-# Fefinimos el fondo
+# Definimos el fondo
 page_bg_img = '''
 <style>
 .stApp {
-    background-color: #CEBB9B;
+    background-color: #FFFFFF;
 }
 </style>
 '''
@@ -22,9 +21,20 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 
 
 # Insertamos el logo y el título
-st.image('./dr_voy_logo.jpg')
-st.title('¡Podemos ayudarte a encontrar el establecimiento de salud más cercano!')
-st.header('Dinos dónde estás y qué distancia puedes recorrer.')
+# Crear columnas vacías para centrar la imagen
+col1, col2, col3 = st.columns([1, 2, 1])
+
+# Usar col2 para centrar la imagen
+with col2:
+    st.image("./dr_mapp_01.jpg", width=300)
+
+# Centrar un título usando HTML y CSS
+st.markdown("<h1 style='text-align: center;'>¡Podemos ayudarte a encontrar el establecimiento de salud más cercano!</h1>", unsafe_allow_html=True)
+#st.title('¡Podemos ayudarte a encontrar el establecimiento de salud más cercano!')
+# Línea divisora
+st.markdown("---")
+st.markdown("<h2 style='text-align: center;'>Dinos dónde estás y qué distancia puedes recorrer.</h2>", unsafe_allow_html=True)
+#st.header('Dinos dónde estás y qué distancia puedes recorrer.')
 
 
 # Cargo los datos del rígido
@@ -81,87 +91,74 @@ def encontrar_localizaciones_cercanas(latitud_referencia, longitud_referencia, d
     # Convertir la lista de distancias a un DataFrame
     distancias_df = pd.DataFrame(distancias)
 
+    if distancias_df.empty:
+        st.stop()
+
     # Ordenar el DataFrame por la distancia en orden ascendente
     distancias_df = distancias_df.sort_values(by='distancia')
 
     # Devolver las 'n' localizaciones más cercanas
     return distancias_df.head(cantidad_establecimientos)
 
-# Función que se ejecuta cuando el usuario hace una selección
-# def filtrar_dataframe(change):
-    global df_filtrado_global
-    if change['type'] == 'change' and change['name'] == 'value':
-        # Filtrar el DataFrame según la opción seleccionada
-        servicio_seleccionado = change['new']
-
-        # Si se selecciona 'Todos', mostrar todo el DataFrame
-        if servicio_seleccionado == 'Todos':
-            df_filtrado_global = df_final
-        else:
-            # Filtrar el DataFrame según el servicio seleccionado
-            ##df_filtrado = df[df['País'] == pais_seleccionado]
-            df_filtrado_global = df_final[df_final['CATEGORIA_TIPOLOGIA'] == servicio_seleccionado]
-
-        # Limpiar la salida anterior
-        #clear_output(wait=True)
-
-        # Mostrar el DataFrame filtrado
-        ##print(f"\nFiltrando por servicio: {servicio_seleccionado}")
-        ##display(df_filtrado_global.head())
-
-        # Retornar el DataFrame filtrado
-        ##return df_filtrado_global
-
-# ------------ NO ESTOY SEGURO SI ESTA PARTE VA -------------------------------
-
-# Función que se ejecuta cuando el botón es presionado
-#def mostrar_dataframe(b):
-#    #clear_output(wait=True)
-#
-#   # Mostrar el DataFrame original
-#   print("DataFrame original:")
-#    display(df_final)
-
-#    # Mostrar el DataFrame filtrado
-#    if not df_filtrado_global.empty:
-#        print(f"\nFiltrando por servicio: {desplegable.value}")
-#        display(df_filtrado_global)
-#    else:
-#        print("No se ha seleccionado un servicio o el filtro no tiene resultados.")
-
-# ------------------------------------------------------------------------------
 
 # EJECUCIÓN
 # Solicitar la dirección al usuario
 direccion = st.text_input('Ingrese la dirección (sin acentos, el formato es: dirección, ciudad, país): ')
 
+if not direccion:
+    st.stop()  # Detener la ejecución aquí
+
 # Cantidad de establecimientos a mostrar
 ##cantidad = int(input("Ingrese la cantidad de establecimientos a mostrar: "))
 
 # El usuario tiene que definir una distancia máxima para filtrar los establecimientos
-dist_maxima = st.slider('Seleccionar distancia máxima', min_value=0, max_value=50)
+dist_maxima = st.slider('Seleccionar distancia máxima', min_value=0, max_value=100)
+
+if not dist_maxima or dist_maxima == 0:
+    st.stop()  # Detener la ejecución aquí
 
 # Convertir la dirección en coordenadas
-coordenadas = direccion_a_coordenadas(direccion)
+try:
+    coordenadas = direccion_a_coordenadas(direccion)
 
 
 
-latitud_ref = coordenadas[0]
-longitud_ref = coordenadas[1]
+    latitud_ref = coordenadas[0]
+    longitud_ref = coordenadas[1]
 
-# # Definir las opciones del desplegable, incluyendo la opción 'Todos'
-opciones = ['Todos'] + df_final['CATEGORIA_TIPOLOGIA'].unique().tolist()
-opciones = sorted(opciones)
+    # # Definir las opciones del desplegable, incluyendo la opción 'Todos'
+
+    opciones = ['Todos'] + df_final['CATEGORIA_TIPOLOGIA'].unique().tolist()
+    #opciones = df_final['CATEGORIA_TIPOLOGIA'].unique().tolist()
+    opciones = sorted(opciones)
+except TypeError as e:
+    #st.error(f"Ocurrió un error: {e}")
+    st.warning("Dirección no encontrada. Ingrese nuevamente el dato.")
+    st.stop()
 
 # ---------------- DUDA ----------------
 # Acá intento adaptar la selección de tipos de estableciemietos al tipo de widget de streamlit
 
 tipo_elegido = st.multiselect('Elige el tipo de establecimiento que necesitas', opciones)
 
+# Lógica para restringir la selección
+#if 'Todos' in tipo_elegido:
 
-df_filtrado_global = df_final[df_final['CATEGORIA_TIPOLOGIA'].isin(tipo_elegido)]
 
+# Si se selecciona 'Todos', mostrar todo el DataFrame
+if 'Todos' in tipo_elegido:  # Cambiar la condición para verificar si 'Todos' está en la lista
+    
+    # Si se selecciona 'Todos', deseleccionar las demás opciones
+    tipo_elegido = ['Todos']
+    st.warning("Al seleccionar 'Todos', no aplicarán otras opciones en la búsqueda.")
+    df_filtrado_global = df_final
+else:
+# Filtrar el DataFrame según el servicio seleccionado
+    df_filtrado_global = df_final[df_final['CATEGORIA_TIPOLOGIA'].isin(tipo_elegido)]
 
+#df_filtrado_global = df_final[df_final['CATEGORIA_TIPOLOGIA'].isin(tipo_elegido)]
+
+#print(df_flitrado_global)
 # --------------------------------------
 
 # Encontrar las localizaciones más cercanas
@@ -170,7 +167,18 @@ localizaciones_cercanas = encontrar_localizaciones_cercanas(latitud_ref, longitu
 
 # Mostrar las localizaciones cercanas, si existen
 if not localizaciones_cercanas.empty:
-    st.write(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']])
+    #st.write(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']])
+    # Renombrar columnas
+    localizaciones_cercanas.rename(columns={
+    'nombre': 'Nombre del Establecimiento',
+    'distancia': 'Distancia (km)',
+    'domicilio': 'Dirección',
+    'servicio': 'Tipo de Servicio'
+    }, inplace=True)
+    #st.dataframe(localizaciones_cercanas[['nombre', 'distancia', 'domicilio', 'servicio']], hide_index=True)
+
+    # Mostrar el DataFrame sin el índice y con los nuevos nombres de columnas
+    st.dataframe(localizaciones_cercanas[['Nombre del Establecimiento', 'Distancia (km)', 'Dirección', 'Tipo de Servicio']], hide_index=True)
 else:
     st.write("No hay localizaciones dentro del rango especificado.")
 
@@ -187,7 +195,7 @@ def generar_mapa_localizaciones_cercanas(latitud_referencia, longitud_referencia
     ##localizaciones_cercanas = encontrar_localizaciones_cercanas(latitud_referencia, longitud_referencia, dataset)
 
     # Crear el mapa centrado en la localización de referencia
-    mapa = folium.Map(location=[latitud_ref, longitud_ref], zoom_start=7)
+    mapa = folium.Map(location=[latitud_ref, longitud_ref], zoom_start=12)
 
     # Añadir un marcador para la localización de referencia
     folium.Marker(
@@ -200,9 +208,9 @@ def generar_mapa_localizaciones_cercanas(latitud_referencia, longitud_referencia
     for index, row in localizaciones_cercanas.iterrows():
         lat = row['latitud']
         lon = row['longitud']
-        nombre = row['nombre']
-        distancia = row['distancia']
-        tipo = row['servicio']
+        nombre = row['Nombre del Establecimiento']
+        distancia = row['Distancia (km)']
+        tipo = row['Tipo de Servicio']
 
         # Añadir un marcador para cada localización cercana
         folium.Marker(
